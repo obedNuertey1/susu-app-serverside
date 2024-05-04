@@ -1,0 +1,297 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model aboutus {
+  abid  Int    @id @default(autoincrement())
+  about String @db.Text
+}
+
+model additional_fees {
+  id     Int    @id @default(autoincrement())
+  get_id String @db.VarChar(200)
+  tid    String @db.VarChar(200)
+  fee    String @db.VarChar(200)
+  Amount String @db.VarChar(200)
+}
+
+model attachment {
+  id            Int      @id @default(autoincrement())
+  get_id        String   @db.VarChar(200)
+  tid           String   @db.VarChar(200)
+  attached_file String   @db.Text
+  date_time     DateTime @default(now()) @db.Timestamp(0)
+}
+
+model backup {
+  id          Int      @id @default(autoincrement())
+  tracking_id String   @db.VarChar(200)
+  amount      String   @db.VarChar(200)
+  address     String   @db.Text
+  date_time   DateTime @default(now()) @db.Timestamp(0)
+}
+
+model banner {
+  banaid Int    @id @default(autoincrement())
+  bannar String @db.Text
+}
+
+model battachment {
+  id            Int      @id @default(autoincrement())
+  get_id        String   @db.VarChar(200)
+  tid           String   @db.VarChar(200)
+  attached_file String   @db.Text
+  date_time     DateTime @default(now()) @db.Timestamp(0)
+}
+
+model borrowers {
+  id        Int      @id @default(autoincrement())
+  fname     String   @db.VarChar(200)
+  lname     String   @db.VarChar(200)
+  email     String   @db.VarChar(200)
+  phone     String   @db.VarChar(200)
+  addrs1    String   @db.Text
+  addrs2    String   @db.Text
+  city      String   @db.VarChar(200)
+  state     String   @db.VarChar(200)
+  zip       String   @db.VarChar(200)
+  country   String   @db.VarChar(200)
+  comment   String   @db.Text
+  account   String   @unique(map: "account") @db.VarChar(200)
+  balance   Decimal  @db.Decimal(18, 2)
+  image     String?  @db.VarChar(200)
+  date_time DateTime @default(now()) @db.Timestamp(0)
+  status    String   @db.VarChar(200)
+}
+
+model collateral {
+  id                 Int    @id @default(autoincrement())
+  idm                String @db.VarChar(200)
+  tid                String @db.VarChar(200)
+  name               String @db.VarChar(200)
+  type_of_collateral String @db.VarChar(200)
+  model              String @db.VarChar(200)
+  make               String @db.VarChar(200)
+  serial_number      String @db.VarChar(200)
+  estimated_price    String @db.VarChar(200)
+  proof_of_ownership String @db.Text
+  cimage             String @db.Text
+  observation        String @db.Text
+}
+
+model countries {
+  id      Int    @id @default(autoincrement())
+  name    String @default("") @db.VarChar(50)
+  alpha_2 String @default("") @db.VarChar(200)
+  alpha_3 String @default("") @db.VarChar(200)
+}
+
+model emp_permission {
+  id          Int    @id @default(autoincrement())
+  tid         String @db.VarChar(200)
+  module_name String @db.VarChar(350)
+  pcreate     String @db.VarChar(20)
+  pread       String @db.VarChar(20)
+  pupdate     String @db.VarChar(20)
+  pdelete     String @db.VarChar(20)
+}
+
+model emp_role {
+  id   Int    @id @default(autoincrement())
+  role String @db.VarChar(200)
+}
+
+model etemplates {
+  id             Int      @id @default(autoincrement())
+  sender         String   @db.VarChar(200)
+  receiver_email String   @db.VarChar(350)
+  subject        String   @db.VarChar(350)
+  msg            String   @db.Text
+  time_date      DateTime @default(now()) @db.Timestamp(0)
+}
+
+model faqs {
+  id      Int    @id @default(autoincrement())
+  topic   String @db.Text
+  content String @db.Text
+}
+
+model fin_info {
+  id         Int    @id @default(autoincrement())
+  get_id     String @db.VarChar(200)
+  tid        String @db.VarChar(200)
+  occupation String @db.Text
+  mincome    String @db.VarChar(200)
+}
+
+model footer {
+  id        Int    @id @default(autoincrement())
+  email     String @db.VarChar(200)
+  pho       String @db.VarChar(200)
+  face      String @db.VarChar(200)
+  webs      String @db.VarChar(200)
+  conh      String @db.VarChar(200)
+  twi       String @db.VarChar(200)
+  gplus     String @db.VarChar(200)
+  ins       String @db.VarChar(200)
+  yous      String @db.VarChar(200)
+  about     String @db.Text
+  apply     String @db.Text
+  mission   String @db.Text
+  objective String @db.Text
+  map       String @db.Text
+}
+
+model hiw {
+  hid Int    @id @default(autoincrement())
+  hiw String @db.Text
+}
+
+model loan_info {
+  id           Int    @id @default(autoincrement())
+  borrower     String @db.VarChar(200)
+  baccount     String @db.VarChar(200)
+  desc         String @db.Text
+  amount       String @db.VarChar(200)
+  date_release String @db.VarChar(200)
+  agent        String @db.VarChar(200)
+  g_name       String @db.VarChar(200)
+  g_phone      String @db.VarChar(200)
+  g_address    String @db.Text
+  rela         String @db.VarChar(200)
+  g_image      String @db.VarChar(200)
+  status       String @db.VarChar(200)
+  remarks      String @db.Text
+  pay_date     String @db.VarChar(200)
+  amount_topay String @db.VarChar(200)
+  teller       String @db.VarChar(200)
+  remark       String @db.Text
+  upstatus     String @db.VarChar(200)
+}
+
+model message {
+  id          Int      @id @default(autoincrement())
+  sender_id   String   @db.VarChar(200)
+  sender_name String   @db.VarChar(200)
+  msg_to      String   @db.VarChar(200)
+  subject     String   @db.VarChar(300)
+  message     String   @db.Text
+  date_time   DateTime @default(now()) @db.Timestamp(0)
+}
+
+model mywallet {
+  id     Int      @id @default(autoincrement())
+  tid    String   @db.VarChar(200)
+  t_to   String   @db.VarChar(200)
+  Amount String   @db.VarChar(200)
+  Desc   String   @db.VarChar(200)
+  wtype  String   @db.VarChar(200)
+  tdate  DateTime @default(now()) @db.Timestamp(0)
+}
+
+model pay_schedule {
+  id       Int    @id @default(autoincrement())
+  get_id   String @db.VarChar(200)
+  tid      String @db.VarChar(200)
+  schedule String @db.VarChar(200)
+  balance  String @db.VarChar(200)
+  interest String @db.VarChar(200)
+  payment  String @db.VarChar(200)
+}
+
+model payment_schedule {
+  id       Int    @id @default(autoincrement())
+  idm      String @db.VarChar(200)
+  tid      String @db.VarChar(200)
+  term     String @db.VarChar(200)
+  day      String @db.VarChar(200)
+  schedule String @db.VarChar(200)
+  interest String @db.VarChar(200)
+  penalty  String @db.VarChar(200)
+}
+
+model payments {
+  id            Int    @id @default(autoincrement())
+  tid           String @db.VarChar(200)
+  account       String @db.VarChar(200)
+  account_no    String @db.VarChar(200)
+  customer      String @db.VarChar(200)
+  loan          String @db.VarChar(200)
+  pay_date      String @db.VarChar(200)
+  amount_to_pay String @db.VarChar(200)
+  remarks       String @db.Text
+}
+
+model sms {
+  id          Int    @id @default(autoincrement())
+  sms_gateway String @db.Text
+  username    String @db.Text
+  password    String @db.Text
+  api         String @db.Text
+  status      String @db.Text
+}
+
+model systemset {
+  sysid       Int    @id @default(autoincrement())
+  title       String @db.VarChar(200)
+  name        String @db.VarChar(200)
+  footer      String @db.Text
+  abb         String @db.VarChar(200)
+  fax         String @db.Text
+  currency    String @db.Text
+  website     String @db.Text
+  mobile      String @db.Text
+  image       String @db.VarChar(200)
+  address     String @db.Text
+  email       String @db.Text
+  map         String @db.Text
+  stamp       String @db.VarChar(350)
+  timezone    String @db.Text
+  sms_charges String @db.VarChar(200)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model transaction {
+  id        Int      @id @default(autoincrement())
+  txid      String   @db.VarChar(200)
+  t_type    String   @db.VarChar(200)
+  acctno    String   @db.VarChar(200)
+  fn        String   @db.VarChar(200)
+  ln        String   @db.VarChar(200)
+  email     String   @db.VarChar(300)
+  phone     String   @db.VarChar(200)
+  amount    Decimal  @db.Decimal(18, 2)
+  date_time DateTime @default(now()) @db.Timestamp(0)
+  username  String?  @db.VarChar(50)
+  isSync    Boolean? @db.Bit(1)
+}
+
+model twallet {
+  id    Int    @id @default(autoincrement())
+  tid   String @db.VarChar(200)
+  Total String @db.VarChar(200)
+}
+
+model user {
+  userid   Int    @id @default(autoincrement())
+  name     String @db.VarChar(200)
+  email    String @db.VarChar(200)
+  phone    String @db.VarChar(200)
+  addr1    String @db.Text
+  addr2    String @db.Text
+  city     String @db.VarChar(200)
+  state    String @db.VarChar(200)
+  zip      String @db.VarChar(200)
+  country  String @db.VarChar(200)
+  comment  String @db.VarChar(200)
+  username String @db.VarChar(200)
+  password String @db.VarChar(200)
+  id       String @db.VarChar(200)
+  image    String @db.Text
+  role     String @db.VarChar(200)
+}
