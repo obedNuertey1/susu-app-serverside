@@ -1,9 +1,12 @@
 import { Module } from '@nestjs/common';
 import { BorrowersService } from './borrowers.service';
 import { BorrowersController } from './borrowers.controller';
+import { PrismaService } from './prisma.service';
+
 
 @Module({
   controllers: [BorrowersController],
-  providers: [BorrowersService],
+  providers: [BorrowersService, PrismaService],
 })
-export class BorrowersModule {}
+export class BorrowersModule {
+}
