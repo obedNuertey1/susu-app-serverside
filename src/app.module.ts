@@ -5,10 +5,11 @@ import { BorrowersModule } from './borrowers/borrowers.module';
 import { LoggerMiddleware } from './borrowers/logger/logger.middleware';
 import { UsersModule } from './users/users.module';
 import { TransactionsModule } from './transactions/transactions.module';
+import { SystemSettingsModule } from './system_settings/system_settings.module';
 
 
 @Module({
-  imports: [BorrowersModule, UsersModule, TransactionsModule],
+  imports: [BorrowersModule, UsersModule, TransactionsModule, SystemSettingsModule],
   controllers: [AppController],
   providers: [AppService],
 })
