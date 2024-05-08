@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { BorrowersService } from './borrowers.service';
 import { BorrowersController } from './borrowers.controller';
-import { PrismaService } from './prisma.service';
+import { PrismaService } from '../prisma.service';
 
 
 @Module({

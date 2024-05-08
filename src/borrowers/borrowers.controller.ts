@@ -23,11 +23,17 @@ export class BorrowersController {
     return;
   }
   
+  @Get('accountNumber/:num')
+  getAccountNum(@Param('num') num: string){
+    console.log(num);
+    return this.borrowersService.getAccountNumber(num);
+  }
+  
   @Get('alldata')
   findAll(@Query("") querykeys: BorrowerSearchDto){
     return this.borrowersService.findAll(querykeys);
   }
-
+  
 
 
   @Get('alldata/:id')

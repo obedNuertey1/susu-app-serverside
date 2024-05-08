@@ -3,10 +3,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { BorrowersModule } from './borrowers/borrowers.module';
 import { LoggerMiddleware } from './borrowers/logger/logger.middleware';
+import { UsersModule } from './users/users.module';
+import { TransactionsModule } from './transactions/transactions.module';
 
 
 @Module({
-  imports: [BorrowersModule],
+  imports: [BorrowersModule, UsersModule, TransactionsModule],
   controllers: [AppController],
   providers: [AppService],
 })
