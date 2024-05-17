@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma.service';
-import bcrypt, {hash} from "bcrypt";
+import {hash} from "bcrypt";
 import { uid } from 'uid';
 
 @Injectable()
@@ -10,8 +10,9 @@ export class UsersService {
 
   constructor(private readonly prismaService: PrismaService){}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto, makeAdmin: string) {
     const hashedPassword:string = await hash(createUserDto.password, 12);
+    const adminPassKey = process.env.ADMIN_PASSKEY
     try{
       return await this.prismaService.user.create({
         data:{
@@ -25,7 +26,7 @@ export class UsersService {
           name: createUserDto.name || "N/A",
           password: hashedPassword,
           phone: createUserDto.phone || "N/A",
-          role: createUserDto.role || "USER",
+          role: (adminPassKey == makeAdmin)?"ADMIN":"USER",
           state: createUserDto.state || "N/A",
           username: createUserDto.username || "N/A",
           zip: createUserDto.zip || "N/A",
@@ -49,9 +50,9 @@ export class UsersService {
     try{
       return await this.prismaService.user.findFirst({
         where: {
-          userid: {equals: id}
-        }
-      });
+          userid:{equals: id}
+}        }
+      );
     }catch(e){
       throw new Error(e.message);
     }
@@ -59,16 +60,18 @@ export class UsersService {
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     try{
+      const user = await this.findOne(id);
+      console.log(updateUserDto.image);
       return await this.prismaService.user.update({
         data:{
-          addr1: updateUserDto.addr1 || "N/A",
-          addr2: updateUserDto.addr2 || "N/A",
-          city: updateUserDto.city || "N/A",
-          country: updateUserDto.country || "N/A",
-          image: updateUserDto.image || "N/A",
-          phone: updateUserDto.phone || "N/A",
-          state: updateUserDto.state || "N/A",
-          zip: updateUserDto.zip || "N/A"
+          addr1: updateUserDto.addr1?updateUserDto.addr1:user.addr1?user.addr1:"N/A",
+          addr2: updateUserDto.addr2?updateUserDto.addr2:user.addr2?user.addr2:"N/A",
+          city: updateUserDto.city?updateUserDto.city:user.city?user.city:"N/A",
+          country: updateUserDto.country?updateUserDto.country:user.country?user.country:"N/A",
+          image: updateUserDto.image || user.image,
+          phone: updateUserDto.phone?updateUserDto.phone:user.phone?user.phone:"N/A",
+          state: updateUserDto.state?updateUserDto.state:user.state?user.state:"N/A",
+          zip: updateUserDto.zip?updateUserDto.zip:user.zip?user.zip:"N/A"
         },
         where:{
           userid: id

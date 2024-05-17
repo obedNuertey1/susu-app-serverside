@@ -3,7 +3,7 @@ import { SystemSettingsService } from './system_settings.service';
 import { CreateSystemSettingDto } from './dto/create-system_setting.dto';
 import { UpdateSystemSettingDto } from './dto/update-system_setting.dto';
 
-@Controller('system-settings')
+@Controller('api/v1/system-settings')
 export class SystemSettingsController {
   constructor(private readonly systemSettingsService: SystemSettingsService) {}
 
