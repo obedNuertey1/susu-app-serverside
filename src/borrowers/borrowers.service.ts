@@ -4,11 +4,12 @@ import { UpdateBorrowerDto } from './dto/update-borrower.dto';
 import { Borrower } from './entities/borrower.entity';
 import { PrismaService } from 'src/prisma.service';
 import { BorrowerSearchDto } from './dto/borrower-search.dto';
+import { SearchAndPagination } from './search_and_pagination/search_and_pagination';
 
 @Injectable()
 export class BorrowersService {
 
-  constructor(private prismaService: PrismaService){}
+  constructor(private prismaService: PrismaService, private readonly searchAndPagination: SearchAndPagination){}
 
   create(createBorrowerDto: CreateBorrowerDto) {
     return 'This action adds a new borrower';
@@ -19,78 +20,19 @@ export class BorrowersService {
     try{
 
       if(querykeys.pageIndex && querykeys.searchQuery && querykeys.searchKey){
-        const queryResult = await this.prismaService.borrowers.findMany({
-          where:{
-            [querykeys.searchKey]: {contains: (querykeys.searchQuery).toLowerCase()}
-          },
-          take: rowsPerPage,
-          skip: rowsPerPage*(Number(querykeys.pageIndex)?Number(querykeys.pageIndex)-1:0),
-          select:{
-            id: true,
-            fname: true,
-            account: true,
-            phone: true,
-            date_time: true,
-            country: true,
-            status: true,
-          }
-        })
-        const result = await this.prismaService.borrowers.findMany({
-          where:{
-            [querykeys.searchKey]: {contains: (querykeys.searchQuery).toLowerCase()}
-          }
-          ,
-          select:{
-            id: true,
-            fname: true,
-            account: true,
-            phone: true,
-            date_time: true,
-            country: true,
-            status: true,
-          }
-        });
-        const pages = Math.ceil((result.length)/rowsPerPage);
-        return {pages, queryResult};
+       
+        const getallFields = await this.getFields();
+        const getdata = await this.prismaService.borrowers.findMany({orderBy: {id: 'desc'}});
+        const myResult = await this.searchAndPagination.funcs(getallFields, getdata, rowsPerPage, querykeys.searchQuery, querykeys.searchKey, querykeys.pageIndex, "by-key")
+
       }
   
       if(querykeys.pageIndex && querykeys.searchQuery){
-        const queryResult =  await this.prismaService.borrowers.findMany({
-          where:{
-            OR:[{fname: {contains: (querykeys.searchQuery).toLowerCase()}}, {lname: {contains: (querykeys.searchQuery).toLowerCase()}}, {email: {contains: (querykeys.searchQuery).toLowerCase()}}, {phone: {contains: (querykeys.searchQuery).toLowerCase()}}, {addrs1: {contains: (querykeys.searchQuery).toLowerCase()}}, {addrs2: {contains: (querykeys.searchQuery).toLowerCase()}}, {city: {contains: (querykeys.searchQuery).toLowerCase()}}, {id: {equals: Boolean(Number((querykeys.searchQuery).toLowerCase()))?Number(querykeys.searchQuery):0}}, {state: {contains: (querykeys.searchQuery).toLowerCase()}}, {zip: {contains: (querykeys.searchQuery).toLowerCase()}}, {country: {contains: (querykeys.searchQuery).toLowerCase()}}, {comment: {contains: (querykeys.searchQuery).toLowerCase()}}, {account: {contains: (querykeys.searchQuery).toLowerCase()}}, 
-              {image: {contains: (querykeys.searchQuery).toLowerCase()}}, {status: {contains: (querykeys.searchQuery).toLowerCase()}}]
-          },
-          take: rowsPerPage,
-          skip: rowsPerPage*(Number(querykeys.pageIndex)?Number(querykeys.pageIndex)-1:0),
-          select:{
-            id: true,
-            fname: true,
-            account: true,
-            phone: true,
-            date_time: true,
-            country: true,
-            status: true,
-          }
-        })
-  
-        const result = await this.prismaService.borrowers.findMany({
-          where:{
-            OR:[{fname: {contains: (querykeys.searchQuery).toLowerCase()}}, {lname: {contains: (querykeys.searchQuery).toLowerCase()}}, {email: {contains: (querykeys.searchQuery).toLowerCase()}}, {phone: {contains: (querykeys.searchQuery).toLowerCase()}}, {addrs1: {contains: (querykeys.searchQuery).toLowerCase()}}, {addrs2: {contains: (querykeys.searchQuery).toLowerCase()}}, {city: {contains: (querykeys.searchQuery).toLowerCase()}}, 
-              {id: {equals: Boolean(Number((querykeys.searchQuery).toLowerCase()))?Number(querykeys.searchQuery):0}}, {state: {contains: (querykeys.searchQuery).toLowerCase()}}, {zip: {contains: (querykeys.searchQuery).toLowerCase()}}, {country: {contains: (querykeys.searchQuery).toLowerCase()}}, {comment: {contains: (querykeys.searchQuery).toLowerCase()}}, {account: {contains: (querykeys.searchQuery).toLowerCase()}}, 
-              {image: {contains: (querykeys.searchQuery).toLowerCase()}}, {status: {contains: (querykeys.searchQuery).toLowerCase()}}]
-          },
-          select:{
-            id: true,
-            fname: true,
-            account: true,
-            phone: true,
-            date_time: true,
-            country: true,
-            status: true,
-          }
-        })
-        const pages = Math.ceil(result.length/rowsPerPage);
-        return {pages, queryResult};
+        
+        const getallFields = await this.getFields();
+        const getdata = await this.prismaService.borrowers.findMany({orderBy: {id: 'desc'}});
+        const myResult = await this.searchAndPagination.funcs(getallFields, getdata, rowsPerPage, querykeys.searchQuery, querykeys.searchKey, querykeys.pageIndex, "for-all")
+        return myResult;
       }
   
       if(querykeys.pageIndex){
@@ -105,7 +47,8 @@ export class BorrowersService {
             date_time: true,
             country: true,
             status: true,
-          }
+          },
+          orderBy: {id: "desc"}
         })
         const result = await this.prismaService.borrowers.findMany({
           select:{
@@ -116,9 +59,11 @@ export class BorrowersService {
             date_time: true,
             country: true,
             status: true,
-          }
+          },
+          orderBy: {id: "desc"}
         });
         const pages = Math.ceil(result.length/rowsPerPage);
+        console.log("if(querykeys.pageIndex){")
         return {pages, queryResult};
       }
   
@@ -131,8 +76,10 @@ export class BorrowersService {
           date_time: true,
           country: true,
           status: true,
-        }
+        },
+        orderBy:{id: "desc"}
       });
+      console.log("any")
       const pages = Math.ceil(queryResult.length/rowsPerPage);
       return {pages, queryResult};
     }catch(e){console.error(e.message)}
