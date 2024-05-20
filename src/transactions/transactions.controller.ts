@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
+import { TransactionsSearchDto } from './dto/transactions-search-dto';
 
 @Controller('api/v1/transactions')
 export class TransactionsController {
@@ -13,14 +14,24 @@ export class TransactionsController {
   }
 
   @Get()
-  findAll() {
-    return this.transactionsService.findAll();
+  getFields(@Query('fields') fields: string) {
+    if(fields == 'true'){
+      return this.transactionsService.getFields();
+    }
+    return;
   }
 
-  @Get(':id')
+  @Get('alldata')
+  findAllTx(@Query("") querykeys: TransactionsSearchDto){
+    return this.transactionsService.findAllTx(querykeys);
+  }
+
+  @Get('alldata/:id')
   findOne(@Param('id') id: string) {
     return this.transactionsService.findOne(+id);
   }
+
+
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateTransactionDto: UpdateTransactionDto) {

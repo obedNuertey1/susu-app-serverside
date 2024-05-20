@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Query } from '@
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UsersSearchDto } from './dto/users-search-dto';
 
 @Controller('api/v1/users')
 export class UsersController {
@@ -20,6 +21,19 @@ export class UsersController {
   @Get('username/:value')
   findByUsername(@Param('value') value: string){
     return this.usersService.findByUsername(value);
+  }
+
+  @Get('currentUser/alldata')
+  findAllUsers(@Query("") querykeys: UsersSearchDto){
+    return this.usersService.findAllUsers(querykeys);
+  }
+
+  @Get('fields/alldata')
+  getFields(@Query('fields') fields: string){
+    if(fields == 'true'){
+      return this.usersService.getFields();
+    }
+    return;
   }
 
   @Get('email/:value')

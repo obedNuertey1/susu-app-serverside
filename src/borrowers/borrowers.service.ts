@@ -24,7 +24,7 @@ export class BorrowersService {
         const getallFields = await this.getFields();
         const getdata = await this.prismaService.borrowers.findMany({orderBy: {id: 'desc'}});
         const myResult = await this.searchAndPagination.funcs(getallFields, getdata, rowsPerPage, querykeys.searchQuery, querykeys.searchKey, querykeys.pageIndex, "by-key")
-
+        return myResult;
       }
   
       if(querykeys.pageIndex && querykeys.searchQuery){

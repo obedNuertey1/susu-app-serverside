@@ -4,11 +4,13 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma.service';
 import {hash} from "bcrypt";
 import { uid } from 'uid';
+import { SearchAndPagination } from './search_and_pagination/search_and_pagination';
+import { UsersSearchDto } from './dto/users-search-dto';
 
 @Injectable()
 export class UsersService {
 
-  constructor(private readonly prismaService: PrismaService){}
+  constructor(private readonly prismaService: PrismaService, private readonly searchAndPagination: SearchAndPagination){}
 
   async create(createUserDto: CreateUserDto, makeAdmin: string) {
     const hashedPassword:string = await hash(createUserDto.password, 12);
@@ -44,6 +46,100 @@ export class UsersService {
     }catch(e){
       throw new Error(e.message);
     }
+  }
+
+  async findAllUsers(querykeys:UsersSearchDto){
+    const rowsPerPage = Number(querykeys.rowsPerPage || 20);
+    try{
+      if(querykeys.pageIndex && querykeys.searchQuery && querykeys.searchKey){
+        const getallFields = await this.getFields();
+        const getdata = await this.prismaService.user.findMany({
+          orderBy: {id: 'desc'}
+        });
+        const myResult = await this.searchAndPagination.usersFunc(getallFields, getdata, rowsPerPage, querykeys.searchQuery, querykeys.searchKey, querykeys.pageIndex, "by-key")
+        return myResult;
+      }
+
+      if(querykeys.pageIndex && querykeys.searchQuery){
+        
+        const getallFields = await this.getFields();
+        const getdata = await this.prismaService.user.findMany({orderBy: {id: 'desc'}});
+
+        const myResult = await this.searchAndPagination.usersFunc(getallFields, getdata, rowsPerPage, querykeys.searchQuery, querykeys.searchKey, querykeys.pageIndex, "for-all")
+        return myResult;
+      }
+
+      if(querykeys.pageIndex){
+        const queryResult = await this.prismaService.user.findMany({
+          take: rowsPerPage,
+          skip: rowsPerPage*(Number(querykeys.pageIndex)?Number(querykeys.pageIndex)-1:0),
+          select:{
+            id: true,
+            name: true,
+            phone: true,
+            role: true,
+            email: true,
+            country: true,
+            state: true,
+            city:true
+          },
+          orderBy: {id: "desc"}
+        })
+        const result = await this.prismaService.user.findMany({
+          select:{
+            id: true,
+            name: true,
+            phone: true,
+            role: true,
+            email: true,
+            country: true,
+            state: true,
+            city:true
+          },
+          orderBy: {id: "desc"}
+        });
+        const pages = Math.ceil(result.length/rowsPerPage);
+        console.log("if(querykeys.pageIndex){")
+        return {pages, queryResult};
+      }
+  
+      const queryResult = await this.prismaService.user.findMany({
+        select:{
+          id: true,
+          name: true,
+          phone: true,
+          role: true,
+          email: true,
+          country: true,
+          state: true,
+          city:true
+        },
+        orderBy:{id: "desc"}
+      });
+      console.log("any")
+      const pages = Math.ceil(queryResult.length/rowsPerPage);
+      return {pages, queryResult};
+
+    }catch(e){
+      console.log(e.message);
+    }
+  }
+
+  async getFields():Promise<string[]>{
+    const data = await this.prismaService.user.findFirst({
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        role: true,
+        email: true,
+        country: true,
+        state: true,
+        city:true
+      }
+    })
+    const fields: string[] = Object.keys(data);
+    return fields;
   }
 
   async findOne(id: number) {
