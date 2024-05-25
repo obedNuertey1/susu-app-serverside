@@ -9,11 +9,81 @@ import { SearchAndPagination } from './search_and_pagination/search_and_paginati
 @Injectable()
 export class BorrowersService {
 
+
   constructor(private prismaService: PrismaService, private readonly searchAndPagination: SearchAndPagination){}
 
-  create(createBorrowerDto: CreateBorrowerDto) {
-    return 'This action adds a new borrower';
+  async create(createBorrowerDto: CreateBorrowerDto) {
+
+    try{
+      let newAccountNum:number = await this.getFieldIncreaseBy1(this.prismaService.borrowers, "account");
+      return await this.prismaService.borrowers.create({
+        data: {
+          account: `${newAccountNum}`,
+          fname: createBorrowerDto.fname || "N/A",
+          lname: createBorrowerDto.lname || "N/A",
+          addrs1: createBorrowerDto.addrs1 || "N/A",
+          city: createBorrowerDto.city || "N/A",
+          state: createBorrowerDto.state || "N/A",
+          zip: createBorrowerDto.zip || "N/A",
+          country: createBorrowerDto.country || "GH",
+          email: createBorrowerDto.email || "N/A",
+          comment: createBorrowerDto.comment || "N/A",
+          image: createBorrowerDto.image || "N/A",
+          addrs2: createBorrowerDto.addrs2 || "N/A",
+          balance: createBorrowerDto.balance || 0,
+          phone: createBorrowerDto.phone || "N/A",
+          status: createBorrowerDto.status || "pending"
+        },
+        select:{
+          account: true,
+          fname: true,
+          lname: true,
+          addrs1: true,
+          city: true,
+          state: true,
+          zip: true,
+          country: true,
+          email: true,
+          comment: true,
+          image: true,
+          addrs2: true,
+          balance: true,
+          phone: true,
+          status: true
+        }
+      })
+
+    }catch(e){
+      throw new Error(e.message);
+    }
   }
+
+  async getFieldIncreaseBy1(handler:any, field:string ):Promise<number>{
+    try{
+      const {_min} = await handler.aggregate({
+        orderBy:{
+          [field]: 'desc'
+        },
+        _min:{
+          [field]: true
+        },
+        take: 1
+      })
+      if(field == 'account'){
+        let raw = _min[field];
+        let firstFour = String(Number(raw.slice(0, 4)) + 1);
+        let lastOnes = raw.slice(firstFour.length, raw.length);
+        let result = Number([firstFour, lastOnes].join(''));
+        return result;
+      }
+
+      let result = Number(_min[field]) + 1;
+      return result;
+    }catch(e){
+      throw new Error(e.message);
+    }
+  }
+
 
   async findAll(querykeys:BorrowerSearchDto) {
     const rowsPerPage = Number(querykeys.rowsPerPage || 20);
@@ -63,7 +133,6 @@ export class BorrowersService {
           orderBy: {id: "desc"}
         });
         const pages = Math.ceil(result.length/rowsPerPage);
-        console.log("if(querykeys.pageIndex){")
         return {pages, queryResult};
       }
   
@@ -79,10 +148,38 @@ export class BorrowersService {
         },
         orderBy:{id: "desc"}
       });
-      console.log("any")
       const pages = Math.ceil(queryResult.length/rowsPerPage);
       return {pages, queryResult};
     }catch(e){console.error(e.message)}
+  }
+
+  async updateWithAccountNum(num:string, updateBorrowerDto:UpdateBorrowerDto){
+    try{
+      const borrower = await this.findOneWithAccountNum(num);
+      return await this.prismaService.borrowers.update({
+        data:{
+          addrs1: updateBorrowerDto.addrs1?updateBorrowerDto.addrs1:borrower.addrs1?borrower.addrs1:"N/A",
+          addrs2: updateBorrowerDto.addrs2?updateBorrowerDto.addrs2:borrower.addrs2?borrower.addrs2:"N/A",
+          city: updateBorrowerDto.city?updateBorrowerDto.city:borrower.city?borrower.city:"N/A",
+          comment: updateBorrowerDto.comment?updateBorrowerDto.comment:borrower.comment?borrower.comment:"N/A",
+          fname: updateBorrowerDto.fname?updateBorrowerDto.fname:borrower.fname?borrower.fname:"N/A",
+          country: updateBorrowerDto.country?updateBorrowerDto.country:borrower.country?borrower.country:"N/A",
+          email: updateBorrowerDto.email?updateBorrowerDto.email:borrower.email?borrower.email:"N/A",
+          image: updateBorrowerDto.image?updateBorrowerDto.image:borrower.image?borrower.image:"N/A",
+          lname: updateBorrowerDto.lname?updateBorrowerDto.lname:borrower.lname?borrower.lname:"N/A",
+          phone: updateBorrowerDto.phone?updateBorrowerDto.phone:borrower.phone?borrower.phone:"N/A",
+          state: updateBorrowerDto.state?updateBorrowerDto.state:borrower.state?borrower.state:"N/A",
+          status: updateBorrowerDto.status?updateBorrowerDto.status:borrower.status?borrower.status:"N/A",
+          zip:updateBorrowerDto.zip?updateBorrowerDto.zip:borrower.zip?borrower.zip:"N/A"
+        },
+        where:{
+          id: borrower.id
+        }
+      })
+    }catch(e){
+      console.log(e.message);
+      throw new Error(e.message);
+    }
   }
 
   async findOne(borrowerId: number):Promise<Borrower> {
@@ -91,6 +188,22 @@ export class BorrowersService {
         id: {equals: Number(borrowerId)}
       }
     });
+  }
+
+  async deleteWithAccountNum(num:string){
+    return await this.prismaService.borrowers.deleteMany({
+      where:{
+        account: {equals: num}
+      }
+    })
+  }
+
+  async findOneWithAccountNum(borrowerAccountNum: string){
+    return await this.prismaService.borrowers.findFirst({
+      where:{
+        account: {equals: borrowerAccountNum}
+      }
+    })
   }
 
   async getAccountNumber(num: string){

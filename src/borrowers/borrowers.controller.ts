@@ -28,6 +28,16 @@ export class BorrowersController {
     console.log(num);
     return this.borrowersService.getAccountNumber(num);
   }
+
+  @Patch('accountNumber/:num')
+  updateWithAccountNum(@Param('num') num: string, @Body() updateBorrowerDto:UpdateBorrowerDto ){
+    return this.borrowersService.updateWithAccountNum(num, updateBorrowerDto);
+  }
+
+  @Delete('accountNumber/:num')
+  deleteWithAccountNum(@Param('num') num:string){
+    return this.borrowersService.deleteWithAccountNum(num);
+  }
   
   @Get('alldata')
   findAll(@Query("") querykeys: BorrowerSearchDto){

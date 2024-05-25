@@ -113,7 +113,7 @@ export class TransactionsService {
           t_type: createTransactionDto.t_type || "Deposit",
           txid: `TXID-${uid()}`,
           username: createTransactionDto.username || "Agent B",//login username
-          isSync: createTransactionDto.isSync || false
+          isSync: createTransactionDto.isSync || ((process.env.IS_SYNC == 'true')?true:false)
         },
         select: {id:true, acctno: true, email:true, amount: true, date_time: true, txid:true}
       });
