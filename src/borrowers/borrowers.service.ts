@@ -5,17 +5,18 @@ import { Borrower } from './entities/borrower.entity';
 import { PrismaService } from 'src/prisma.service';
 import { BorrowerSearchDto } from './dto/borrower-search.dto';
 import { SearchAndPagination } from './search_and_pagination/search_and_pagination';
+import { RandomizeService } from 'src/funcs/randomize/randomize.service';
 
 @Injectable()
 export class BorrowersService {
 
 
-  constructor(private prismaService: PrismaService, private readonly searchAndPagination: SearchAndPagination){}
+  constructor(private prismaService: PrismaService, private readonly searchAndPagination: SearchAndPagination, private readonly randomizeService: RandomizeService){}
 
   async create(createBorrowerDto: CreateBorrowerDto) {
 
     try{
-      let newAccountNum:number = await this.getFieldIncreaseBy1(this.prismaService.borrowers, "account");
+      let newAccountNum:string = await this.getFieldIncreaseBy1(this.prismaService.borrowers, "id");
       return await this.prismaService.borrowers.create({
         data: {
           account: `${newAccountNum}`,
@@ -58,27 +59,36 @@ export class BorrowersService {
     }
   }
 
-  async getFieldIncreaseBy1(handler:any, field:string ):Promise<number>{
+  async getFieldIncreaseBy1(handler:any, field:string ):Promise<string>{
     try{
-      const {_min} = await handler.aggregate({
+      const {_max} = await handler.aggregate({
         orderBy:{
           [field]: 'desc'
         },
-        _min:{
-          [field]: true
-        },
-        take: 1
+        take: 1,
+        select: {
+          _max: true
+        }
       })
-      if(field == 'account'){
-        let raw = _min[field];
-        let firstFour = String(Number(raw.slice(0, 4)) + 1);
-        let lastOnes = raw.slice(firstFour.length, raw.length);
-        let result = Number([firstFour, lastOnes].join(''));
-        return result;
-      }
+      
 
-      let result = Number(_min[field]) + 1;
-      return result;
+      
+      console.log("I am a radom text= ", await this.randomizeService.generate(8));
+      // console.log("result",testResult['_max']);
+      console.log(_max);
+      
+      if(field == 'id'){
+        let raw = _max[field];
+        if(Boolean(raw) || raw > 0){
+          console.log('raw',raw);
+          let newResult = `BOR${raw+1}${await this.randomizeService.generate(5)}`;
+          return `${newResult}`;
+        }
+
+        let newResult = `BOR${1}${await this.randomizeService.generate(5)}`;
+        return `${newResult}`;
+      }
+      // return await this.randomizeService.generate(5)
     }catch(e){
       throw new Error(e.message);
     }

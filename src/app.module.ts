@@ -6,12 +6,15 @@ import { LoggerMiddleware } from './borrowers/logger/logger.middleware';
 import { UsersModule } from './users/users.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { SystemSettingsModule } from './system_settings/system_settings.module';
+import { RandomizeService } from './funcs/randomize/randomize.service';
+// import { FuncsModule } from './funcs/funcs/funcs.module';
+import { FuncsModule } from './funcs/funcs.module';
 
 
 @Module({
-  imports: [BorrowersModule, UsersModule, TransactionsModule, SystemSettingsModule],
+  imports: [BorrowersModule, UsersModule, TransactionsModule, SystemSettingsModule, FuncsModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, RandomizeService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
